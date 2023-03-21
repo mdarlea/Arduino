@@ -9,6 +9,9 @@ namespace Arduino.Core.ViewModels
 {
     public class TemperatureViewModel : ObservableRecipient
     {
+        private static readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
+        private LocationResponse? location;
+
         private readonly IAccessTokenService accessTokenService;
         private readonly IWeatherForecastService weatherForecastService;
         private readonly IGeocodeService geocodeService;
@@ -46,7 +49,14 @@ namespace Arduino.Core.ViewModels
         public float? IndoorTemperature
         {
             get => indoorTemperature;
-            private set => SetProperty(ref indoorTemperature, value);
+            private set => SetProperty(ref indoorTemperature, value, true);
+        }
+
+        private bool displayTemperatures = false;
+        public bool DisplayTemperatures
+        {
+            get => displayTemperatures;
+            private set => SetProperty(ref displayTemperatures, value);
         }
 
         protected override void OnActivated()
@@ -57,7 +67,11 @@ namespace Arduino.Core.ViewModels
             Messenger.Register<TemperatureViewModel, TimerTickedMessage>(this, async(r, m) => 
             {
                 await GetOutdoorTemperatureAsync();
-                await GetIndoorTemperatureAsync(); 
+                await GetIndoorTemperatureAsync();
+
+                DisplayTemperatures = true;
+
+                Messenger.Send(new TemperaturesUpdatedMessage(true));
             });
         }
 
@@ -80,7 +94,21 @@ namespace Arduino.Core.ViewModels
 
         private async Task<float?> GetOutdoorTemperatureAsync() 
         {
-            var location = await geocodeService.GetLocationForAddress(geocodeSettings.Address);
+            if (location == null)
+            {
+                await semaphoreSlim.WaitAsync();
+                try
+                {
+                    if (location == null)
+                    {
+                        location = await geocodeService.GetLocationForAddress(geocodeSettings.Address);
+                    }
+                }
+                finally
+                {
+                    semaphoreSlim.Release();
+                }
+            }
 
             if (location != null) 
             {

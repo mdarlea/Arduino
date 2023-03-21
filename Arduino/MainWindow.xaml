@@ -7,23 +7,15 @@
 		xmlns:uc="clr-namespace:Arduino.UserControls"
         mc:Ignorable="d"
         Title="Main Window" Height="450" Width="800" Loaded="Window_Loaded" Unloaded="Window_Unloaded">
-    <Grid>
+	<Window.Resources>
+		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+	</Window.Resources>
+	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
 		<uc:Temperatures />
-		<Button Content="Start" HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Top" Width="81" Height="38" Command="{Binding TemperatureCommand}"/>
-
-		<StackPanel xml:space="default" Grid.Row="1">
-			<TextBlock>
-            <Run Text="Task status:"/>
-            <Run Text="{Binding TemperatureCommand.ExecutionTask.Status, Mode=OneWay}"/>           
-			</TextBlock>
-			<Button
-            Content="Click me!"
-            Command="{Binding TemperatureCommand}"/>			
-		</StackPanel>
 	</Grid>
 </Window>

@@ -23,7 +23,7 @@ namespace Arduino.Core.Services
                         System.Text.Encoding.ASCII.GetBytes(
                            $"{userName}:{password}")));
 
-                HttpResponseMessage result = await client.GetAsync("https://login.meteomatics.com/api/v1/token");
+                var result = await client.GetAsync("https://login.meteomatics.com/api/v1/token");
                 if (result.IsSuccessStatusCode)
                 {
                     var response = await result.Content.ReadAsStringAsync();

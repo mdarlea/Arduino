@@ -4,10 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Arduino.UserControls"
-             mc:Ignorable="d" d:DesignWidth="800" Loaded="UserControl_Loaded" Unloaded="UserControl_Unloaded" Height="130">
+			 xmlns:gauge="http://schemas.syncfusion.com/wpf"
+             mc:Ignorable="d" d:DesignWidth="450" Loaded="UserControl_Loaded" Unloaded="UserControl_Unloaded" Height="350">
+	<UserControl.Resources>
+		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+	</UserControl.Resources>
 	<Grid>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="200"></ColumnDefinition>
+			<ColumnDefinition Width="300"></ColumnDefinition>
 			<ColumnDefinition Width="300"></ColumnDefinition>
 		</Grid.ColumnDefinitions>
 
@@ -18,9 +23,16 @@
 		</Grid.RowDefinitions>
 
 		<Label Content="Outdoor Temperature:" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" Margin="10" VerticalAlignment="Center" Height="25" FontWeight="Bold" FontFamily="Arial" FontSize="14" />
-		<Label Content="{Binding OutdoorTemperature}" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="10" VerticalAlignment="Center" Height="25" FontFamily="Arial" FontSize="14" />
+
+		<local:TemperatureGauge Grid.Column="1" DisplayTemperatures="{Binding DisplayTemperatures}" MinTemperature="20" MaxTemperature="35"  
+								Temperature="{Binding OutdoorTemperature}"  />
+
+		<local:TemperatureGauge Grid.Column="1" Grid.Row="1" DisplayTemperatures="{Binding DisplayTemperatures}" MinTemperature="20" MaxTemperature="35"  
+								Temperature="{Binding IndoorTemperature}"  />
 
 		<Label Content="Indoor Temperature:" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" Margin="10" VerticalAlignment="Center" Height="25" FontWeight="Bold" FontFamily="Arial" FontSize="14" />
-		<Label Content="{Binding IndoorTemperature}" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Margin="10" VerticalAlignment="Center" Height="25" FontFamily="Arial" FontSize="14" />
+		
+		<gauge:Clock Grid.Column="2" Grid.RowSpan="2" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+
 	</Grid>
 </UserControl>

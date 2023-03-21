@@ -1,0 +1,44 @@
+﻿<UserControl x:Class="Arduino.UserControls.TemperatureGauge"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Arduino.UserControls"
+			 xmlns:gauge="http://schemas.syncfusion.com/wpf"
+             mc:Ignorable="d"
+			 x:Name="temperatureGauge"
+             d:DesignHeight="150" d:DesignWidth="150">
+	<UserControl.Resources>
+		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+	</UserControl.Resources>
+
+	<gauge:SfCircularGauge Height="150" Width="150">
+		<gauge:SfCircularGauge.Scales>
+			<gauge:CircularScale StartValue="-15" EndValue="45" Interval="10" MinorTicksPerInterval="9" LabelStroke="#5b5b5b" 
+                                     RangePosition="Custom" TickPosition="Custom" LabelPosition="Custom" ShowRim="False" LabelOffset="0.6" Height="150">
+				<gauge:CircularScale.MajorTickSettings>
+					<gauge:MajorTickSetting StartOffset="0.85" EndOffset="0.65" StrokeThickness="1" Stroke="Black" />
+				</gauge:CircularScale.MajorTickSettings>
+				<gauge:CircularScale.MinorTickSettings>
+					<gauge:MinorTickSetting StartOffset="0.85" EndOffset="0.75" StrokeThickness="1" Stroke="Black" />
+				</gauge:CircularScale.MinorTickSettings>
+
+				<gauge:CircularScale.Ranges>
+					<gauge:CircularRange OuterStartOffset="0.85" OuterEndOffset="0.85"
+							InnerStartOffset="0.65" InnerEndOffset="0.65" StartValue="-15" EndValue="{Binding MinTemperature, ElementName=temperatureGauge}" Stroke= "Blue" />
+					<gauge:CircularRange OuterStartOffset="0.85" OuterEndOffset="0.85"
+							InnerStartOffset="0.65" InnerEndOffset="0.65" StartValue="{Binding MinTemperature, ElementName=temperatureGauge}" EndValue="{Binding MaxTemperature, ElementName=temperatureGauge}" Stroke= "Green" />
+					<gauge:CircularRange OuterStartOffset="0.85" OuterEndOffset="0.85"
+							InnerStartOffset="0.65" InnerEndOffset="0.65" StartValue="{Binding MaxTemperature, ElementName=temperatureGauge}" EndValue="45" Stroke= "Red" />
+				</gauge:CircularScale.Ranges>
+
+				<gauge:CircularScale.Pointers>
+					<gauge:CircularPointer Visibility="{Binding DisplayTemperatures, ElementName=temperatureGauge, Converter={StaticResource BooleanToVisibilityConverter}}" EnableAnimation="True" 
+										   Value="{Binding Temperature, ElementName=temperatureGauge}" NeedleLengthFactor="0.77" NeedlePointerStroke="#f7ab9c"
+							NeedlePointerStrokeThickness="12" TailLengthFactor="0.15" TailFill="#f7ab9c" KnobRadiusFactor="0.08" KnobStroke="#eff2f1" KnobStrokeThickness="5" KnobFill="#e8e8e8" NeedlePointerType="Triangle">
+					</gauge:CircularPointer>
+				</gauge:CircularScale.Pointers>
+			</gauge:CircularScale>
+		</gauge:SfCircularGauge.Scales>
+	</gauge:SfCircularGauge>
+</UserControl>

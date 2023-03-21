@@ -25,8 +25,11 @@ namespace Arduino.Core.Services
                 await semaphoreSlim.WaitAsync();
                 try
                 {
-                    nanoPort.Open();
-                    return true;
+                    if (!nanoPort.IsOpen)
+                    {
+                        nanoPort.Open();
+                        return true;
+                    }
                 }
                 catch
                 {
@@ -97,6 +100,31 @@ namespace Arduino.Core.Services
             }
         }
 
+        public void Dispose()
+        {
+            if (nanoPort.IsOpen)
+            {
+                nanoPort.Close();
+            }
+
+            nanoPort.Dispose();
+        }
+
+        public async Task<ArduinoResponse> GetMessage(SendMessageToArduinoRequest request)
+        {
+            await EnsureConnection();
+
+            var watch = new Stopwatch();
+
+            var value = await RequestValueFromArduino(watch, request.Key, request.IntValue, request.FloatValue);
+
+            return new ArduinoResponse
+            {
+                Response = value,
+                ElapsedTime = watch.ElapsedMilliseconds
+            };
+        }
+
         private async Task<string?> RequestValueFromArduino(Stopwatch watch, string key, int inputInt = 0, float inputFloat = 0)
         {
             string? value = null;
@@ -126,14 +154,5 @@ namespace Arduino.Core.Services
             return value;
         }
 
-        public void Dispose()
-        {
-            if (nanoPort.IsOpen)
-            {
-                nanoPort.Close();
-            }
-
-            nanoPort.Dispose();
-        }
     }
 }
