@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "author": "Anonymous maker",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-arduino-uno", "id": "uno", "top": 125.4, "left": -0.6, "attrs": {} },
+    {
+      "type": "wokwi-rgb-led",
+      "id": "led1",
+      "top": -54.54,
+      "left": 97.45,
+      "attrs": { "common": "cathode" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": 28.78,
+      "left": 70.29,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r2",
+      "top": 31.04,
+      "left": 101.86,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r3",
+      "top": 30.79,
+      "left": 130.35,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-rgb-led",
+      "id": "rgb1",
+      "top": -36.19,
+      "left": 209.38,
+      "attrs": { "common": "cathode" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r4",
+      "top": 56.56,
+      "left": 209.28,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r6",
+      "top": 56.85,
+      "left": 225.74,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-ntc-temperature-sensor",
+      "id": "ntc1",
+      "top": 12.2,
+      "left": -58.2,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r5",
+      "top": 56.76,
+      "left": 188.59,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    { "type": "wokwi-lcd1602", "id": "lcd1", "top": -25.32, "left": 287.37, "attrs": {} },
+    {
+      "type": "wokwi-resistor",
+      "id": "r7",
+      "top": 120.15,
+      "left": 481.46,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn1",
+      "top": 218.74,
+      "left": 373.76,
+      "attrs": { "bounce": "0", "color": "red" }
+    },
+    {
+      "type": "wokwi-buzzer",
+      "id": "bz1",
+      "top": 159.37,
+      "left": 562.23,
+      "rotate": 90,
+      "attrs": { "volume": "0.1" }
+    }
+  ],
+  "connections": [
+    [ "r1:1", "led1:R", "red", [ "v0" ] ],
+    [ "led1:COM", "uno:GND.1", "black", [ "v0" ] ],
+    [ "led1:G", "r2:1", "green", [ "v0" ] ],
+    [ "led1:B", "r3:1", "blue", [ "v0" ] ],
+    [ "rgb1:G", "r4:1", "green", [ "v0" ] ],
+    [ "rgb1:B", "r6:1", "blue", [ "v0" ] ],
+    [ "rgb1:COM", "uno:GND.1", "black", [ "v0" ] ],
+    [ "ntc1:GND", "uno:GND.1", "black", [ "h0" ] ],
+    [ "ntc1:OUT", "uno:A0", "green", [ "h0" ] ],
+    [ "ntc1:VCC", "uno:VIN", "red", [ "h0" ] ],
+    [ "r1:2", "uno:13", "red", [ "h0" ] ],
+    [ "r2:2", "uno:12", "green", [ "h0" ] ],
+    [ "r3:2", "uno:11", "blue", [ "h0" ] ],
+    [ "rgb1:R", "r5:1", "red", [ "v0" ] ],
+    [ "r5:2", "uno:10", "red", [ "h0" ] ],
+    [ "r4:2", "uno:9", "green", [ "h0" ] ],
+    [ "r6:2", "uno:A1", "blue", [ "h0" ] ],
+    [ "lcd1:VSS", "uno:GND.2", "green", [ "v0" ] ],
+    [ "lcd1:K", "uno:GND.2", "green", [ "v0" ] ],
+    [ "lcd1:RW", "uno:GND.2", "green", [ "v0" ] ],
+    [ "lcd1:VDD", "uno:5V", "green", [ "v0" ] ],
+    [ "lcd1:A", "r7:1", "green", [ "v0" ] ],
+    [ "r7:2", "uno:5V", "green", [ "v0" ] ],
+    [ "lcd1:RS", "uno:8", "green", [ "v0" ] ],
+    [ "lcd1:E", "uno:7", "green", [ "v0" ] ],
+    [ "lcd1:D4", "uno:6", "green", [ "v0" ] ],
+    [ "lcd1:D5", "uno:5", "green", [ "v0" ] ],
+    [ "lcd1:D6", "uno:4", "green", [ "v0" ] ],
+    [ "lcd1:D7", "uno:3", "green", [ "v0" ] ],
+    [ "btn1:2.l", "uno:GND.2", "red", [ "h0" ] ],
+    [ "btn1:1.r", "uno:2", "red", [ "v0" ] ],
+    [ "bz1:1", "uno:GND.1", "green", [ "h0" ] ],
+    [ "bz1:2", "uno:A2", "green", [ "h0" ] ]
+  ],
+  "serialMonitor": { "display": "terminal", "newline": "lf" },
+  "dependencies": {}
+}
