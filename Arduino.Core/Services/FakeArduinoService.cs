@@ -1,5 +1,4 @@
 ﻿using Arduino.Core.Models;
-using Arduino.Core.Models.Meteomatics;
 
 namespace Arduino.Core.Services
 {
@@ -10,16 +9,16 @@ namespace Arduino.Core.Services
             return await Task.FromResult(true);
         }
 
-        public async Task<IndoorTemperatureResponse> GetIndoorTemperature(SendMessageToArduinoRequest request)
+        public async Task<TemperatureResponse> GetTemperature(SendMessageToArduinoRequest request)
         {
             var response = await GetMessage(request);
 
-            float indoorTemperature;
-            float.TryParse(response.Response, out indoorTemperature);
+            float temperature;
+            float.TryParse(response.Response, out temperature);
 
-            return new IndoorTemperatureResponse
+            return new TemperatureResponse
             {
-                IndoorTemperature = indoorTemperature,
+                Temperature = temperature,
                 ElapsedTime = 100
             };
         }
@@ -36,6 +35,42 @@ namespace Arduino.Core.Services
 
         public Task<ArduinoResponse> GetMessage(SendMessageToArduinoRequest request)
         {
+            if (request.Key == "IMin") 
+            {
+                return Task.FromResult(new ArduinoResponse
+                {
+                    Response = "19",
+                    ElapsedTime = 100,
+                });
+            }
+
+            if (request.Key == "OMin")
+            {
+                return Task.FromResult(new ArduinoResponse
+                {
+                    Response = "10",
+                    ElapsedTime = 100,
+                });
+            }
+
+            if (request.Key == "IMax")
+            {
+                return Task.FromResult(new ArduinoResponse
+                {
+                    Response = "25",
+                    ElapsedTime = 100,
+                });
+            }
+
+            if (request.Key == "OMax")
+            {
+                return Task.FromResult(new ArduinoResponse
+                {
+                    Response = "30",
+                    ElapsedTime = 100,
+                });
+            }
+
             Random rand = new Random();
             double min = 5;
             double max = 40;

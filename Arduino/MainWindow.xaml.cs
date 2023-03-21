@@ -11,8 +11,9 @@ namespace Arduino
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly DispatcherTimer dispatcherTimer = new DispatcherTimer();
-        
+        private readonly DispatcherTimer indoorTemperatureDispatcherTimer = new DispatcherTimer();
+        private readonly DispatcherTimer outdoorTemperatureDispatcherTimer = new DispatcherTimer();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -20,11 +21,11 @@ namespace Arduino
             var currentApp = Application.Current as App;
             DataContext = currentApp!.ServiceProvider?.GetRequiredService<MainWindowViewModel>();
 
-            dispatcherTimer.Tick += dispatcherTimer_Tick;
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 5);
-            dispatcherTimer.Start();
+            indoorTemperatureDispatcherTimer.Tick += indoorTemperatureDispatcherTimer_Tick;
+            indoorTemperatureDispatcherTimer.Interval = new TimeSpan(0, 0, 5);
 
-            ViewModel.TimerTicked();
+            outdoorTemperatureDispatcherTimer.Tick += outdoorTemperatureDispatcherTimer_Tick;
+            outdoorTemperatureDispatcherTimer.Interval = new TimeSpan(1, 0, 0);
         }
 
         public MainWindowViewModel ViewModel => (MainWindowViewModel)DataContext;
@@ -32,17 +33,25 @@ namespace Arduino
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             ViewModel.IsActive= true;
+
+            indoorTemperatureDispatcherTimer.Start();
         }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
             ViewModel.IsActive= false;
+
+            indoorTemperatureDispatcherTimer.Stop();
         }
 
-        private void dispatcherTimer_Tick(object? sender, EventArgs e)
+        private void indoorTemperatureDispatcherTimer_Tick(object? sender, EventArgs e)
         {
-            ViewModel.TimerTicked();
-            
+            ViewModel.IndoorTemperatureTimerTicked();            
+        }
+
+        private void outdoorTemperatureDispatcherTimer_Tick(object? sender, EventArgs e)
+        {
+            ViewModel.OutdoorTemperatureTimerTicked();
         }
     }
 }

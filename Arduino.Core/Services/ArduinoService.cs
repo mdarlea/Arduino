@@ -44,27 +44,27 @@ namespace Arduino.Core.Services
             return true;
         }
 
-        public async Task<IndoorTemperatureResponse> GetIndoorTemperature(SendMessageToArduinoRequest request)
+        public async Task<TemperatureResponse> GetTemperature(SendMessageToArduinoRequest request)
         {
             await EnsureConnection();
 
             var watch = new Stopwatch();
 
-            var temperature = await RequestValueFromArduino(watch, request.Key);
+            var temperatureValue = await RequestValueFromArduino(watch, request.Key);
 
-            if (!string.IsNullOrEmpty(temperature)) 
+            if (!string.IsNullOrEmpty(temperatureValue)) 
             {
-                float indoorTemperature;
-                float.TryParse(temperature, out indoorTemperature);
+                float temperature;
+                float.TryParse(temperatureValue, out temperature);
 
-                return new IndoorTemperatureResponse
+                return new TemperatureResponse
                 {
-                    IndoorTemperature = indoorTemperature,
+                    Temperature = temperature,
                     ElapsedTime = watch.ElapsedMilliseconds
                 };
             }
 
-            return new IndoorTemperatureResponse();            
+            return new TemperatureResponse();            
         }
 
         public async Task WriteMessage(SendMessageToArduinoRequest request)

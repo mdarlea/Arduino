@@ -24,10 +24,14 @@
 
 		<Label Content="Outdoor Temperature:" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" Margin="10" VerticalAlignment="Center" Height="25" FontWeight="Bold" FontFamily="Arial" FontSize="14" />
 
-		<local:TemperatureGauge Grid.Column="1" DisplayTemperatures="{Binding DisplayTemperatures}" MinTemperature="20" MaxTemperature="35"  
+		<local:TemperatureGauge Grid.Column="1" DisplayTemperatures="{Binding DisplayTemperatures}" 
+								MinTemperature="{Binding MinOutdoorTemperature}" 
+								MaxTemperature="{Binding MaxOutdoorTemperature}"  
 								Temperature="{Binding OutdoorTemperature}"  />
 
-		<local:TemperatureGauge Grid.Column="1" Grid.Row="1" DisplayTemperatures="{Binding DisplayTemperatures}" MinTemperature="20" MaxTemperature="35"  
+		<local:TemperatureGauge Grid.Column="1" Grid.Row="1" DisplayTemperatures="{Binding DisplayTemperatures}" 
+								MinTemperature="{Binding MinIndoorTemperature}" 
+								MaxTemperature="{Binding MaxIndoorTemperature}"  
 								Temperature="{Binding IndoorTemperature}"  />
 
 		<Label Content="Indoor Temperature:" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" Margin="10" VerticalAlignment="Center" Height="25" FontWeight="Bold" FontFamily="Arial" FontSize="14" />

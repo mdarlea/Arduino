@@ -59,18 +59,58 @@ namespace Arduino.Core.ViewModels
             private set => SetProperty(ref displayTemperatures, value);
         }
 
-        protected override void OnActivated()
+        private int minOutdoorTemperature;
+        public int MinOutdoorTemperature
+        {
+            get => minOutdoorTemperature;
+            private set => SetProperty(ref minOutdoorTemperature, value);
+        }
+
+        private int maxOutdoorTemperature;
+        public int MaxOutdoorTemperature
+        {
+            get => maxOutdoorTemperature;
+            private set => SetProperty(ref maxOutdoorTemperature, value);
+        }
+
+        private int minIndoorTemperature;
+        public int MinIndoorTemperature
+        {
+            get => minIndoorTemperature;
+            private set => SetProperty(ref minIndoorTemperature, value);
+        }
+
+        private int maxIndoorTemperature;
+        public int MaxIndoorTemperature
+        {
+            get => maxIndoorTemperature;
+            private set => SetProperty(ref maxIndoorTemperature, value);
+        }
+
+        protected override async void OnActivated()
         {
             base.OnActivated();
 
+            await GetIndoorMinTemperatureAsync();
+            await GetOutdoorMinTemperatureAsync();
+
+            await GetIndoorMaxTemperatureAsync();
+            await GetOutdoorMaxTemperatureAsync();
+
+            await GetOutdoorTemperatureAsync();
+            await GetIndoorTemperatureAsync();
+
+            DisplayTemperatures = true;
+
             Messenger.Register<TemperatureViewModel, AsyncOutdoorTemperatureRequestMessage>(this, (r, m) => m.Reply(r.GetOutdoorTemperatureAsync()));
-            Messenger.Register<TemperatureViewModel, TimerTickedMessage>(this, async(r, m) => 
+            Messenger.Register<TemperatureViewModel, OutdoorTemperatureTimerTickedMessage>(this, async(r, m) => 
             {
                 await GetOutdoorTemperatureAsync();
+                Messenger.Send(new TemperaturesUpdatedMessage(true));
+            });
+            Messenger.Register<TemperatureViewModel, IndoorTemperatureTimerTickedMessage>(this, async (r, m) =>
+            {
                 await GetIndoorTemperatureAsync();
-
-                DisplayTemperatures = true;
-
                 Messenger.Send(new TemperaturesUpdatedMessage(true));
             });
         }
@@ -84,13 +124,82 @@ namespace Arduino.Core.ViewModels
 
         private async Task GetIndoorTemperatureAsync() 
         {
-            var response = await arduinoService.GetIndoorTemperature(new SendMessageToArduinoRequest 
+            var response = await arduinoService.GetTemperature(new SendMessageToArduinoRequest 
             {
                 Key = arduinoSettings.IndoorTemperatureKey
             });
 
-            IndoorTemperature = response?.IndoorTemperature;
+            IndoorTemperature = response?.Temperature;
         }
+
+        private async Task GetIndoorMinTemperatureAsync()
+        {
+            var response = await arduinoService.GetTemperature(new SendMessageToArduinoRequest
+            {
+                Key = arduinoSettings.MinIndoorTemperatureKey
+            });
+
+            if (response.Temperature.HasValue)
+            {
+                MinIndoorTemperature = (int)Math.Round(response.Temperature.Value);
+            }
+            else 
+            {
+                MinIndoorTemperature = 0;
+            }
+        }
+
+        private async Task GetOutdoorMinTemperatureAsync()
+        {
+            var response = await arduinoService.GetTemperature(new SendMessageToArduinoRequest
+            {
+                Key = arduinoSettings.MinOutdoorTemperatureKey
+            });
+
+            if (response.Temperature.HasValue)
+            {
+                MinOutdoorTemperature = (int)Math.Round(response.Temperature.Value);
+            }
+            else
+            {
+                MinOutdoorTemperature = 0;
+            }
+        }
+
+        private async Task GetIndoorMaxTemperatureAsync()
+        {
+            var response = await arduinoService.GetTemperature(new SendMessageToArduinoRequest
+            {
+                Key = arduinoSettings.MaxIndoorTemperatureKey
+            });
+
+            if (response.Temperature.HasValue)
+            {
+                MaxIndoorTemperature = (int)Math.Round(response.Temperature.Value);
+            }
+            else
+            {
+                MaxIndoorTemperature = 0;
+            }
+        }
+
+        private async Task GetOutdoorMaxTemperatureAsync()
+        {
+            var response = await arduinoService.GetTemperature(new SendMessageToArduinoRequest
+            {
+                Key = arduinoSettings.MaxOutdoorTemperatureKey
+            });
+
+            if (response.Temperature.HasValue)
+            {
+                MaxOutdoorTemperature = (int)Math.Round(response.Temperature.Value);
+            }
+            else
+            {
+                MaxOutdoorTemperature = 0;
+            }
+        }
+
 
         private async Task<float?> GetOutdoorTemperatureAsync() 
         {

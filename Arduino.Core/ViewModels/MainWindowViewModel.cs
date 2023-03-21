@@ -21,12 +21,20 @@ namespace Arduino.Core.ViewModels
             private set => SetProperty(ref loading, value);
         }
 
-        public void TimerTicked() 
+        public void IndoorTemperatureTimerTicked() 
         {
             Loading = true;
 
-            Messenger.Send(new TimerTickedMessage(DateTime.Now));
+            Messenger.Send(new IndoorTemperatureTimerTickedMessage(DateTime.Now));
         }
+
+        public void OutdoorTemperatureTimerTicked()
+        {
+            Loading = true;
+
+            Messenger.Send(new OutdoorTemperatureTimerTickedMessage(DateTime.Now));
+        }
+
         protected override void OnActivated()
         {
             base.OnActivated();

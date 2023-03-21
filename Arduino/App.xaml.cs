@@ -52,6 +52,10 @@ namespace Arduino
             {
                 Configuration?.GetSection("Geocode").Bind(settings);
             });
+            services.AddOptions<ArduinoSettings>().Configure((settings) =>
+            {
+                Configuration?.GetSection("Arduino").Bind(settings);
+            });
 
             services.AddHttpClient("WeatherForecast", httpClient =>
             {

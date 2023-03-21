@@ -1,8 +1,8 @@
 ﻿namespace Arduino.Core.Models
 {
-    public class IndoorTemperatureResponse
+    public class TemperatureResponse
     {
-        public float? IndoorTemperature { get; set; }
+        public float? Temperature { get; set; }
         public long ElapsedTime { get; set; } = 0;
     }
 }
