@@ -1,5 +1,6 @@
 #include "ansi.h"
 #include <LiquidCrystal.h>
+#include "greenhouse-led.cpp"
 
 ANSI ansi(&Serial);
 
@@ -8,20 +9,10 @@ const float BETA = 3950; // should match the Beta Coefficient of the thermistor
 volatile bool systemStarted;
 int button = 2;
 
-int ledExteriorR = 13;
-int ledExteriorG = 12;
-int ledExteriorB = 11;
-
-int ledInteriorR = 10;
-int ledInteriorG = 9;
-int ledInteriorB = A1;
-
-//volatile bool ledInteriorOK = false;
-//volatile bool ledExteriorOK = false;
-
 int speaker = A2;
-#define NOTE_B0  262
-#define NOTE_C1  294
+
+GreenhouseLed ledExterior = GreenhouseLed(13, 12, 11, speaker);
+GreenhouseLed ledInterior = GreenhouseLed(10, 9, A1, speaker);
 
 LiquidCrystal lcd(8, 7, 6, 5, 4, 3);
 
@@ -52,36 +43,26 @@ void setup()
 
   lcd.begin(16, 2);
 
-  pinMode(button, INPUT_PULLUP);
-
-  pinMode(ledExteriorR, OUTPUT);
-  pinMode(ledExteriorG, OUTPUT);
-  pinMode(ledExteriorB, OUTPUT);
-
-  pinMode(ledInteriorR, OUTPUT);
-  pinMode(ledInteriorG, OUTPUT);
-  pinMode(ledInteriorB, OUTPUT);
+  ledExterior.setup();
+  ledInterior.setup();
 
   pinMode(speaker, OUTPUT);
 
   pinMode(button, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(button), systemStartedISR, FALLING);
-
-  Serial.println("Hello, I'm in a terminal!");
-  Serial.println();
 }
 
 void loop() 
 {
   if (!systemStarted) {
-    disableLedExterior();
-    disableLedInterior();
-
-    noTone(speaker);
+    ledExterior.disable();
+    ledInterior.disable();
 
     lcd.clear();
 
     floatFromPC = 0.0;
+    integerFromPC = 0;
+
     indoorTemperature = -500;
     outdoorTemperature = -500;
 
@@ -139,27 +120,21 @@ void loop()
 
 void setOutdoorTemperature(float temperature) {
   if (outdoorTemperature != temperature) {
-    enableLedExterior();
-
     //display outdoor temperature          
     lcd.setCursor(0, 1);
     lcd.print("Outdoor: ");
     lcd.print(temperature);
     lcd.print(" C");  
 
-    if (temperature < outdoorMinTemperature) {      
-      setExteriorLedColor(0, 0, 255);                 
-      tone(speaker, NOTE_B0);
-      delay(1000);
-      noTone(speaker);
+    if (temperature < outdoorMinTemperature) {
+      // if outdoor temperature is lower than min temperature then it turns the blue led on
+      ledExterior.turnBlueLedOn();
     } else if (temperature > outdoorMaxTemperature) {
-      setExteriorLedColor(255, 0, 0);
-      tone(speaker, NOTE_C1);
-      delay(1000);
-      noTone(speaker);
+      // if outdoor temperature is higher than max temperature then it turns the red led on
+      ledExterior.turnRedLedOn();
     } else {
-      setExteriorLedColor(0, 255, 0);
-      noTone(speaker);
+      // if outdoor temperature is within limits then it turns the green led on
+      ledExterior.turnGreenLedOn();
     }
 
     outdoorTemperature = temperature;  
@@ -168,49 +143,32 @@ void setOutdoorTemperature(float temperature) {
 
 void setIndoorTemperature(float temperature) {
   if (outdoorTemperature != temperature) {
-    enableLedInterior();
-
-    //display outdoor temperature          
+    //display indoor temperature          
     lcd.setCursor(0, 0);
     lcd.print("Indoor: ");
     lcd.print(temperature);
     lcd.print(" C");   
 
-    if (temperature < indoorMinTemperature) {      
-      setInteriorLedColor(0, 0, 255);                 
-      tone(speaker, NOTE_B0);
-      delay(1000);
-      noTone(speaker);
+    if (temperature < indoorMinTemperature) {
+      // if indoor temperature is lower than min temperature then it turns the blue led on   
+      ledInterior.turnBlueLedOn();
     } else if (temperature > outdoorMaxTemperature) {
-      setInteriorLedColor(255, 0, 0);
-      tone(speaker, NOTE_C1);
-      delay(1000);
-      noTone(speaker);      
+      // if indoor temperature is higher than max temperature then it turns the red led on
+      ledInterior.turnRedLedOn();
     } else {
-      setInteriorLedColor(0, 255, 0);
-      noTone(speaker);
+      // if indoor temperature is within limits then it turns the green led on
+      ledInterior.turnGreenLedOn();      
     }
 
     indoorTemperature = temperature; 
   }  
 }
 
-void setExteriorLedColor(int redValue, int greenValue, int blueValue) {
-  analogWrite(ledExteriorR, redValue);
-  analogWrite(ledExteriorG, greenValue);
-  analogWrite(ledExteriorB, blueValue);
-}
-
-void setInteriorLedColor(int redValue, int greenValue, int blueValue) {
-  analogWrite(ledInteriorR, redValue);
-  analogWrite(ledInteriorG, greenValue);
-  analogWrite(ledInteriorB, blueValue);
-}
-
 void systemStartedISR() {
   systemStarted = !systemStarted;
 }
 
+//reads data from the serial monitor in the following format: <text, integer, float>. Example: <TO, 30, 0.25>
 void recvWithStartEndMarkers() {
     static boolean recvInProgress = false;
     static byte ndx = 0;
@@ -243,41 +201,18 @@ void recvWithStartEndMarkers() {
     }
 }
 
-void parseData() {      // split the data into its parts
+//split the data into its parts
+void parseData() {      
 
-    char * strtokIndx; // this is used by strtok() as an index
+    char * strtokIndx; //this is used by strtok() as an index
 
-    strtokIndx = strtok(tempChars,",");      // get the first part - the string
+    strtokIndx = strtok(tempChars,","); //get the first part - the string
     strcpy(messageFromPC, strtokIndx); // copy it to messageFromPC
  
-    strtokIndx = strtok(NULL, ","); // this continues where the previous call left off
-    integerFromPC = atoi(strtokIndx);     // convert this part to an integer
+    strtokIndx = strtok(NULL, ","); //this continues where the previous call left off
+    integerFromPC = atoi(strtokIndx); //convert this part to an integer
 
     strtokIndx = strtok(NULL, ",");
-    floatFromPC = atof(strtokIndx);     // convert this part to a float
+    floatFromPC = atof(strtokIndx); //convert this part to a float
 
-}
-
-void enableLedInterior() {
-  digitalWrite(ledInteriorR, HIGH);
-  digitalWrite(ledInteriorG, HIGH);
-  digitalWrite(ledInteriorB, HIGH);
-}
-
-void enableLedExterior() {
-  digitalWrite(ledExteriorR, HIGH);
-  digitalWrite(ledExteriorG, HIGH);
-  digitalWrite(ledExteriorB, HIGH);
-}
-
-void disableLedExterior() {
-  digitalWrite(ledExteriorR, LOW);
-  digitalWrite(ledExteriorG, LOW);
-  digitalWrite(ledExteriorB, LOW);
-}
-
-void disableLedInterior() {
-  digitalWrite(ledInteriorR, LOW);
-  digitalWrite(ledInteriorG, LOW);
-  digitalWrite(ledInteriorB, LOW);
 }
