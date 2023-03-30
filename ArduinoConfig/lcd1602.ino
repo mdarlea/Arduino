@@ -55,8 +55,8 @@ void setup()
 void loop() 
 {
   if (!systemStarted) {
-    ledExterior.disable();
-    ledInterior.disable();
+    ledExterior.turnLedsOff();
+    ledInterior.turnLedsOff();
 
     lcd.clear();
 

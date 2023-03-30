@@ -16,7 +16,7 @@ class Led {
       pinMode(_ledB, OUTPUT);
     };
 
-    void disable() {
+    void turnLedsOff() {
       setDigitalPins(LOW);
     };
 

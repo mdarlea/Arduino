@@ -22,7 +22,7 @@ namespace Arduino
             DataContext = currentApp!.ServiceProvider?.GetRequiredService<MainWindowViewModel>();
 
             indoorTemperatureDispatcherTimer.Tick += indoorTemperatureDispatcherTimer_Tick;
-            indoorTemperatureDispatcherTimer.Interval = new TimeSpan(0, 0, 5);
+            indoorTemperatureDispatcherTimer.Interval = new TimeSpan(0, 5, 0);
 
             outdoorTemperatureDispatcherTimer.Tick += outdoorTemperatureDispatcherTimer_Tick;
             outdoorTemperatureDispatcherTimer.Interval = new TimeSpan(1, 0, 0);
